@@ -19,24 +19,23 @@ export default function LoginPage() {
     };
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${endpointMap[role]}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${endpointMap[role]}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
 
-      if (!res.ok) throw new Error("Login fallito");
+  if (!res.ok) throw new Error("Login fallito");
 
-      const data = await res.json();
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", role);
+  const data = await res.json();
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("role", role);
+  router.push("/dashboard");
 
-      // Redirige alla dashboard specifica (in futuro potremo separarle meglio)
-      router.push("/dashboard");
-    
 } catch {
   setError("Credenziali non valide");
 }
+
   };
 
   return (
