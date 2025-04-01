@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Fan {
+  id        String      @id @default(cuid())
+  name      String
+  email     String      @unique
+  password  String
+  createdAt DateTime    @default(now())
+  fanRewards FanReward[]
+}
+
+model Artist {
+  id        String      @id @default(cuid())
+  name      String
+  email     String      @unique
+  password  String
+  bio       String?
+  createdAt DateTime    @default(now())
+  rewards   Reward[]
+  tracks    Track[]
+  labelId   String?
+  label     Label?      @relation(fields: [labelId], references: [id])
+}
+
+model Label {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  artists   Artist[]
+}
+
+model Reward {
+  id              String      @id @default(cuid())
+  artistId        String
+  artist          Artist      @relation(fields: [artistId], references: [id])
+  type            String      // cash, merch, vip ecc.
+  description     String
+  requiredStreams Int
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  fanRewards      FanReward[]
+}
+
+model Track {
+  id         String      @id @default(cuid())
+  artistId   String
+  artist     Artist      @relation(fields: [artistId], references: [id])
+  title      String
+  url        String
+  createdAt  DateTime    @default(now())
+  fanRewards FanReward[]
+}
+
+model FanReward {
+  id        String   @id @default(cuid())
+  fanId     String
+  fan       Fan      @relation(fields: [fanId], references: [id])
+  rewardId  String
+  reward    Reward   @relation(fields: [rewardId], references: [id])
+  trackId   String
+  track     Track    @relation(fields: [trackId], references: [id])
+  createdAt DateTime @default(now())
+}
