@@ -33,8 +33,8 @@ export default function LoginPage() {
 
       // Redirige alla dashboard specifica (in futuro potremo separarle meglio)
       router.push("/dashboard");
-    } catch (err) {
-  console.error("Errore login:", err.message);
+    
+} catch {
   setError("Credenziali non valide");
 }
   };
