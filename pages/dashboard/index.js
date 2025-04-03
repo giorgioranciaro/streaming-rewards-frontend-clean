@@ -6,7 +6,7 @@ export default function Dashboard() {
   useEffect(() => {
     fetch("https://streaming-rewards-backend-production-ad5b.up.railway.app/api/artist/rewards")
       .then(res => res.json())
-      .then(data => setRewards(data))
+      .then(data => setRewards(data.rewards))
       .catch(err => console.error("Errore nel fetch:", err));
   }, []);
 
