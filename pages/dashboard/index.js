@@ -16,7 +16,7 @@ export default function Dashboard() {
         });
 
         const data = await res.json();
-        setRewards(data);
+        setRewards(data.rewards || []);
       } catch (err) {
         console.error("Errore nel recupero delle rewards:", err);
       }
