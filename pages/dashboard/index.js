@@ -8,39 +8,13 @@ export default function Dashboard() {
   const [role, setRole] = useState(null);
 
   useEffect(() => {
-  const fetchRewards = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.warn("Token non trovato, impossibile effettuare la richiesta.");
-        return;
-      }
-
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/rewards`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error(`Errore dal server: ${res.status}`);
-      }
-
-      const data = await res.json();
-
-      console.log("Risposta API:", data);
-
-      // Se il backend restituisce { rewards: [...] }, usa data.rewards
-      setRewards(data.rewards || data);
-    } catch (err) {
-      console.error("Errore nel fetch delle rewards:", err);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
     }
-  };
 
-  fetchRewards();
-}, []);
-
-
+    // Decodifica del token per ottenere il ruolo
     try {
       const decoded = jwt_decode(token);
       setRole(decoded.role);
@@ -48,23 +22,26 @@ export default function Dashboard() {
       console.error("Token decoding failed", err);
       localStorage.removeItem("token");
       router.push("/login");
+      return;
     }
 
-    // Fetch rewards
+    // Fetch delle rewards
     const fetchRewards = async () => {
       try {
-        const res = await fetch(
-          "https://streaming-rewards-backend-production-ad5b.up.railway.app/api/artist/rewards",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/rewards`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`Errore dal server: ${res.status}`);
+        }
+
         const data = await res.json();
-        setRewards(data);
+        setRewards(data.rewards || data); // Gestione formato risposta
       } catch (err) {
-        console.error("Failed to fetch rewards", err);
+        console.error("Errore nel fetch delle rewards:", err);
       }
     };
 
