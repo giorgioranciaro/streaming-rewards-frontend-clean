@@ -13,26 +13,29 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/${role}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/${role}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
 
-      const data = await res.json();
-      console.log("Response data:", data);
+  const text = await res.text(); // 👈 leggiamo tutto anche se non JSON
+  console.log("Raw response text:", text);
 
-      if (!res.ok) {
-        throw new Error(data.error || "Login failed");
-      }
+  if (!res.ok) {
+    throw new Error(text);
+  }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", role);
+  const data = JSON.parse(text);
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("role", role);
 
-      router.push("/dashboard");
-    } catch (err) {
-      setError(err.message);
-    }
+  router.push("/dashboard");
+} catch (err) {
+  console.error("Login error:", err.message);
+  setError("Errore: " + err.message);
+}
+
   };
 
   return (
