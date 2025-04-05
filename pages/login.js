@@ -20,6 +20,7 @@ export default function Login() {
       });
 
       const data = await res.json();
+      console.log("Response data:", data);
 
       if (!res.ok) {
         throw new Error(data.error || "Login failed");
