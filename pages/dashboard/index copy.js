@@ -8,38 +8,11 @@ export default function Dashboard() {
   const [role, setRole] = useState(null);
 
   useEffect(() => {
-  const fetchRewards = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.warn("Token non trovato, impossibile effettuare la richiesta.");
-        return;
-      }
-
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/rewards`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error(`Errore dal server: ${res.status}`);
-      }
-
-      const data = await res.json();
-
-      console.log("Risposta API:", data);
-
-      // Se il backend restituisce { rewards: [...] }, usa data.rewards
-      setRewards(data.rewards || data);
-    } catch (err) {
-      console.error("Errore nel fetch delle rewards:", err);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
     }
-  };
-
-  fetchRewards();
-}, []);
-
 
     try {
       const decoded = jwt_decode(token);
