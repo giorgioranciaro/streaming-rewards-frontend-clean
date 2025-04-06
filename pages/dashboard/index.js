@@ -1,5 +1,5 @@
- import { useEffect, useState } from "react";
-import jwtDecode from "jwt-decode";
+import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/router";
 
 export default function Dashboard() {
