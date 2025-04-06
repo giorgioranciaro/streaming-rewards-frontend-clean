@@ -8,15 +8,17 @@ export default function Dashboard() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      console.error("Token mancante");
+      console.warn("Token mancante nel localStorage");
       return;
     }
 
     try {
       const decoded = jwt_decode(token);
       setArtist(decoded);
+      console.log("Decoded JWT:", decoded);
     } catch (err) {
       console.error("Token decoding failed", err);
+      return;
     }
 
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/rewards`, {
@@ -33,9 +35,9 @@ export default function Dashboard() {
 
       {artist && (
         <div className="mb-6 bg-white p-4 rounded shadow">
-          <h2 className="text-xl font-semibold mb-2">🎉 Benvenuto, {artist.name}!</h2>
-          <p><strong>Email:</strong> {artist.email}</p>
-          <p><strong>ID:</strong> {artist.userId}</p>
+          <h2 className="text-xl font-semibold mb-2">🎉 Benvenuto, {artist.name || "Artista"}!</h2>
+          <p><strong>Email:</strong> {artist.email || "N/A"}</p>
+          <p><strong>ID:</strong> {artist.userId || "N/A"}</p>
         </div>
       )}
 
