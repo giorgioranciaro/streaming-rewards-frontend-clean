@@ -4,18 +4,18 @@ import { useRouter } from "next/router";
 export default function Dashboard() {
   const router = useRouter();
   const [rewards, setRewards] = useState([]);
-  const [token, setToken] = useState("");
   const [artist, setArtist] = useState(null);
+  const [token, setToken] = useState("");
   const [editingReward, setEditingReward] = useState(null);
   const [formData, setFormData] = useState({ type: "", description: "", requiredStreams: "" });
+  const [artistForm, setArtistForm] = useState({ name: "", email: "", bio: "" });
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     if (!storedToken) return router.push("/login");
-
     setToken(storedToken);
     fetchRewards(storedToken);
-    fetchArtistDetails(storedToken);
+    fetchArtist(storedToken);
   }, []);
 
   const fetchRewards = async (token) => {
@@ -26,16 +26,33 @@ export default function Dashboard() {
     setRewards(data);
   };
 
-  const fetchArtistDetails = async (token) => {
+  const fetchArtist = async (token) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/me`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
     setArtist(data);
+    setArtistForm({ name: data.name, email: data.email, bio: data.bio || "" });
   };
 
   const handleInputChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleArtistInputChange = (e) => {
+    setArtistForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleArtistUpdate = async (e) => {
+    e.preventDefault();
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/me`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(artistForm),
+    });
+    const updated = await res.json();
+    setArtist(updated);
+    alert("Dati aggiornati con successo!");
   };
 
   const handleCreate = async (e) => {
@@ -103,12 +120,39 @@ export default function Dashboard() {
       </div>
 
       {artist && (
-        <div className="mb-8 p-4 bg-white shadow rounded">
-          <h2 className="text-xl font-semibold mb-2">🎤 Informazioni Artista</h2>
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-2">👤 Info Artista</h2>
           <p><strong>ID:</strong> {artist.id}</p>
-          <p><strong>Nome:</strong> {artist.name}</p>
-          <p><strong>Email:</strong> {artist.email}</p>
-          {artist.bio && <p><strong>Bio:</strong> {artist.bio}</p>}
+
+          <form onSubmit={handleArtistUpdate} className="space-y-4 mt-4">
+            <input
+              type="text"
+              name="name"
+              value={artistForm.name}
+              onChange={handleArtistInputChange}
+              className="w-full border px-3 py-2"
+              placeholder="Nome"
+              required
+            />
+            <input
+              type="email"
+              name="email"
+              value={artistForm.email}
+              onChange={handleArtistInputChange}
+              className="w-full border px-3 py-2"
+              placeholder="Email"
+              required
+            />
+            <textarea
+              name="bio"
+              value={artistForm.bio}
+              onChange={handleArtistInputChange}
+              className="w-full border px-3 py-2"
+              placeholder="Biografia"
+              rows={3}
+            />
+            <button className="bg-blue-600 text-white px-4 py-2 rounded">Aggiorna dati artista</button>
+          </form>
         </div>
       )}
 
