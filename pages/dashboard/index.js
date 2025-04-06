@@ -13,7 +13,7 @@ export default function Dashboard() {
     }
 
     try {
-      const decoded = jwt_Decode(token);
+      const decoded = jwt_decode(token);
       setArtist(decoded);
     } catch (err) {
       console.error("Token decoding failed", err);
