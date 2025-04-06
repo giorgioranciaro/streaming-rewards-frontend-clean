@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { jwtDecode } from "jwt-decode"; // ✅ CORRETTO IMPORT
+import { jwtDecode } from "jwt-decode";
 
 export default function Dashboard() {
   const [rewards, setRewards] = useState([]);
+  const [artistName, setArtistName] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -16,7 +17,7 @@ export default function Dashboard() {
 
     let decoded;
     try {
-      decoded = jwtDecode(token); // ✅ CORRETTO UTILIZZO
+      decoded = jwtDecode(token);
     } catch (err) {
       console.error("Token decoding failed", err);
       router.push("/login");
@@ -27,6 +28,11 @@ export default function Dashboard() {
       alert("Accesso riservato agli artisti");
       router.push("/login");
       return;
+    }
+
+    // Salva il nome dell'artista se disponibile nel token (puoi modificare secondo struttura reale)
+    if (decoded.name) {
+      setArtistName(decoded.name);
     }
 
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/rewards`, {
@@ -41,7 +47,10 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen p-8 bg-gray-100">
-      <h1 className="text-3xl font-bold mb-6">🎧 Streaming Rewards Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-2">🎧 Streaming Rewards Dashboard</h1>
+      {artistName && (
+        <p className="text-lg mb-6">Benvenuto, {artistName}!</p>
+      )}
 
       {rewards.length === 0 ? (
         <p>Nessuna reward disponibile.</p>
