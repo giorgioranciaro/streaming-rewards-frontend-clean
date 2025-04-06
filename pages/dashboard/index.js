@@ -9,6 +9,7 @@ export default function Dashboard() {
   const [editingReward, setEditingReward] = useState(null);
   const [formData, setFormData] = useState({ type: "", description: "", requiredStreams: "" });
   const [artistForm, setArtistForm] = useState({ name: "", email: "", bio: "" });
+  const [editingArtist, setEditingArtist] = useState(false);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -52,6 +53,7 @@ export default function Dashboard() {
     });
     const updated = await res.json();
     setArtist(updated);
+    setEditingArtist(false);
     alert("Dati aggiornati con successo!");
   };
 
@@ -123,36 +125,46 @@ export default function Dashboard() {
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-2">👤 Info Artista</h2>
           <p><strong>ID:</strong> {artist.id}</p>
-
-          <form onSubmit={handleArtistUpdate} className="space-y-4 mt-4">
-            <input
-              type="text"
-              name="name"
-              value={artistForm.name}
-              onChange={handleArtistInputChange}
-              className="w-full border px-3 py-2"
-              placeholder="Nome"
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              value={artistForm.email}
-              onChange={handleArtistInputChange}
-              className="w-full border px-3 py-2"
-              placeholder="Email"
-              required
-            />
-            <textarea
-              name="bio"
-              value={artistForm.bio}
-              onChange={handleArtistInputChange}
-              className="w-full border px-3 py-2"
-              placeholder="Biografia"
-              rows={3}
-            />
-            <button className="bg-blue-600 text-white px-4 py-2 rounded">Aggiorna dati artista</button>
-          </form>
+          {!editingArtist ? (
+            <div className="space-y-2">
+              <p><strong>Nome:</strong> {artist.name}</p>
+              <p><strong>Email:</strong> {artist.email}</p>
+              <p><strong>Bio:</strong> {artist.bio}</p>
+              <button onClick={() => setEditingArtist(true)} className="mt-2 bg-blue-600 text-white px-4 py-2 rounded">
+                Modifica dati artista
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleArtistUpdate} className="space-y-4 mt-4">
+              <input
+                type="text"
+                name="name"
+                value={artistForm.name}
+                onChange={handleArtistInputChange}
+                className="w-full border px-3 py-2"
+                placeholder="Nome"
+                required
+              />
+              <input
+                type="email"
+                name="email"
+                value={artistForm.email}
+                onChange={handleArtistInputChange}
+                className="w-full border px-3 py-2"
+                placeholder="Email"
+                required
+              />
+              <textarea
+                name="bio"
+                value={artistForm.bio}
+                onChange={handleArtistInputChange}
+                className="w-full border px-3 py-2"
+                placeholder="Biografia"
+                rows={3}
+              />
+              <button className="bg-green-600 text-white px-4 py-2 rounded">Salva modifiche</button>
+            </form>
+          )}
         </div>
       )}
 
