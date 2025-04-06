@@ -5,6 +5,7 @@ export default function Dashboard() {
   const router = useRouter();
   const [rewards, setRewards] = useState([]);
   const [token, setToken] = useState("");
+  const [artist, setArtist] = useState(null);
   const [editingReward, setEditingReward] = useState(null);
   const [formData, setFormData] = useState({ type: "", description: "", requiredStreams: "" });
 
@@ -14,6 +15,7 @@ export default function Dashboard() {
 
     setToken(storedToken);
     fetchRewards(storedToken);
+    fetchArtistDetails(storedToken);
   }, []);
 
   const fetchRewards = async (token) => {
@@ -22,6 +24,14 @@ export default function Dashboard() {
     });
     const data = await res.json();
     setRewards(data);
+  };
+
+  const fetchArtistDetails = async (token) => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    setArtist(data);
   };
 
   const handleInputChange = (e) => {
@@ -91,6 +101,16 @@ export default function Dashboard() {
           Logout
         </button>
       </div>
+
+      {artist && (
+        <div className="mb-8 p-4 bg-white shadow rounded">
+          <h2 className="text-xl font-semibold mb-2">🎤 Informazioni Artista</h2>
+          <p><strong>ID:</strong> {artist.id}</p>
+          <p><strong>Nome:</strong> {artist.name}</p>
+          <p><strong>Email:</strong> {artist.email}</p>
+          {artist.bio && <p><strong>Bio:</strong> {artist.bio}</p>}
+        </div>
+      )}
 
       <h2 className="text-xl font-semibold mb-2">🎁 Le tue Rewards</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
