@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import jwt_decode from "jwt-decode";
+// import jwt_decode from "jwt-decode"; (riga commentata)
 
 export default function Dashboard() {
   const [rewards, setRewards] = useState([]);
