@@ -1,64 +1,99 @@
 import { useEffect, useState } from "react";
-import jwt_decode from 'jwt-decode';
+import jwt_decode from "jwt-decode";
 
 export default function Dashboard() {
   const [rewards, setRewards] = useState([]);
   const [artist, setArtist] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      console.warn("Token mancante nel localStorage");
+      setError("Token mancante. Effettua il login.");
       return;
     }
 
+    let decoded;
     try {
-      const decoded = jwt_decode(token);
-      setArtist(decoded);
-      console.log("Decoded JWT:", decoded);
+      decoded = jwt_decode(token);
     } catch (err) {
-      console.error("Token decoding failed", err);
+      console.error("Errore nel decoding del token:", err);
+      setError("Token non valido");
       return;
     }
 
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/rewards`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setRewards(data))
-      .catch((err) => console.error("Failed to fetch rewards", err));
+    const fetchRewards = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/rewards`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("Errore nella richiesta delle rewards");
+        }
+
+        const data = await res.json();
+        setRewards(data);
+      } catch (err) {
+        console.error("Errore nel fetch delle rewards:", err);
+        setError("Errore nel caricamento delle rewards");
+      }
+    };
+
+    const fetchArtist = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("Errore nel fetch dell'artista");
+        }
+
+        const data = await res.json();
+        setArtist(data);
+      } catch (err) {
+        console.error("Errore nel fetch dell'artista:", err);
+        setError("Errore nel caricamento dei dati artista");
+      }
+    };
+
+    fetchRewards();
+    fetchArtist();
   }, []);
 
   return (
-    <div className="min-h-screen p-8 bg-gray-100">
-      <h1 className="text-3xl font-bold mb-6">🎧 Streaming Rewards Dashboard</h1>
+    <div style={{ padding: "2rem", fontFamily: "Arial" }}>
+      <h1>🎵 Dashboard Artista</h1>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       {artist && (
-        <div className="mb-6 bg-white p-4 rounded shadow">
-          <h2 className="text-xl font-semibold mb-2">🎉 Benvenuto, {artist.name || "Artista"}!</h2>
-          <p><strong>Email:</strong> {artist.email || "N/A"}</p>
-          <p><strong>ID:</strong> {artist.userId || "N/A"}</p>
+        <div style={{ marginBottom: "2rem" }}>
+          <h2>Dati Artista</h2>
+          <p><strong>Nome:</strong> {artist.name}</p>
+          <p><strong>Email:</strong> {artist.email}</p>
+          <p><strong>ID:</strong> {artist.id}</p>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {rewards.length === 0 ? (
-          <p className="text-gray-600">Nessuna reward disponibile.</p>
-        ) : (
-          rewards.map((reward) => (
-            <div key={reward.id} className="bg-white p-4 rounded shadow">
-              <h2 className="text-xl font-semibold">{reward.type}</h2>
-              <p className="text-gray-700">{reward.description}</p>
-              <p className="text-sm text-gray-500">
-                Streams richiesti: {reward.requiredStreams}
-              </p>
-              <p className="text-sm text-gray-500">
-                Stato: {reward.isActive ? "Attiva" : "Inattiva"}
-              </p>
-            </div>
-          ))
-        )}
-      </div>
+      <h2>Le tue Rewards</h2>
+      {rewards.length === 0 ? (
+        <p>Nessuna reward disponibile.</p>
+      ) : (
+        <ul>
+          {rewards.map((reward) => (
+            <li key={reward.id}>
+              <strong>{reward.type}</strong> - {reward.description} 
+              ({reward.requiredStreams} streams) - {reward.isActive ? "Attiva" : "Inattiva"}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
