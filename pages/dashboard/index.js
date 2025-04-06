@@ -10,8 +10,9 @@ export default function Dashboard() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/login");
-      return;
+      const decoded = jwt_decode(token);
+      console.log("Utente loggato:", decoded);
+      setUser(decoded);
     }
 
     // Decodifica del token per ottenere il ruolo
@@ -25,7 +26,7 @@ export default function Dashboard() {
       return;
     }
 
-    // Fetch delle rewards
+    // Recupero delle rewards
     const fetchRewards = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/rewards`, {
