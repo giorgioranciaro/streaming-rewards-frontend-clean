@@ -8,6 +8,11 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const router = useRouter();
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/login");
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -16,7 +21,7 @@ export default function Dashboard() {
     }
 
     try {
-      jwtDecode(token); // Verifica validità token
+      jwtDecode(token);
     } catch (err) {
       console.error("Errore nel decoding del token:", err);
       setError("Token non valido");
@@ -64,6 +69,10 @@ export default function Dashboard() {
   return (
     <div style={{ padding: "2rem", fontFamily: "Arial" }}>
       <h1>🎵 Dashboard Artista</h1>
+
+      <button onClick={handleLogout} style={{ marginBottom: "1rem" }}>
+        Logout
+      </button>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
