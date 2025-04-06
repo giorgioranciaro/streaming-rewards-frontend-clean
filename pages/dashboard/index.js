@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import decode from "jwt-decode";
+import jwt_decode from 'jwt-decode';
 
 export default function Dashboard() {
   const [rewards, setRewards] = useState([]);
@@ -13,7 +13,7 @@ export default function Dashboard() {
     }
 
     try {
-      const decoded = decode(token);
+      const decoded = jwt_decode(token);
       setArtist(decoded);
       console.log("Decoded JWT:", decoded);
     } catch (err) {
