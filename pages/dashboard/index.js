@@ -1,49 +1,62 @@
-git commit -m "Feat: messaggio di benvenuto artista"
-
 import { useEffect, useState } from "react";
-import jwtDecode from "jwt-decode";
+import jwt_decode from "jwt-decode";
 
 export default function Dashboard() {
+  const [rewards, setRewards] = useState([]);
   const [artist, setArtist] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token) {
+      console.error("Token mancante");
+      return;
+    }
 
-    const fetchArtist = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/me`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+    try {
+      const decoded = jwt_decode(token);
+      setArtist(decoded);
+    } catch (err) {
+      console.error("Token decoding failed", err);
+    }
 
-        if (!res.ok) throw new Error("Errore nel recupero dati artista");
-        const data = await res.json();
-        setArtist(data);
-      } catch (err) {
-        console.error("Errore:", err);
-      }
-    };
-
-    fetchArtist();
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/rewards`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setRewards(data))
+      .catch((err) => console.error("Failed to fetch rewards", err));
   }, []);
-
-  if (!artist) return <div className="p-4">Caricamento artista...</div>;
 
   return (
     <div className="min-h-screen p-8 bg-gray-100">
-      <h1 className="text-3xl font-bold mb-6">🎧 Benvenuto, {artist.name}</h1>
+      <h1 className="text-3xl font-bold mb-6">🎧 Streaming Rewards Dashboard</h1>
 
-      <div className="bg-white p-6 rounded-2xl shadow mb-6">
-        <h2 className="text-xl font-semibold mb-2">📇 Profilo</h2>
-        <p><strong>ID:</strong> {artist.id}</p>
-        <p><strong>Email:</strong> {artist.email}</p>
-        <p><strong>Bio:</strong> {artist.bio || "Nessuna biografia"}</p>
-        <p><strong>Registrato il:</strong> {new Date(artist.createdAt).toLocaleDateString()}</p>
+      {artist && (
+        <div className="mb-6 bg-white p-4 rounded shadow">
+          <h2 className="text-xl font-semibold mb-2">🎉 Benvenuto, {artist.name}!</h2>
+          <p><strong>Email:</strong> {artist.email}</p>
+          <p><strong>ID:</strong> {artist.userId}</p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {rewards.length === 0 ? (
+          <p className="text-gray-600">Nessuna reward disponibile.</p>
+        ) : (
+          rewards.map((reward) => (
+            <div key={reward.id} className="bg-white p-4 rounded shadow">
+              <h2 className="text-xl font-semibold">{reward.type}</h2>
+              <p className="text-gray-700">{reward.description}</p>
+              <p className="text-sm text-gray-500">
+                Streams richiesti: {reward.requiredStreams}
+              </p>
+              <p className="text-sm text-gray-500">
+                Stato: {reward.isActive ? "Attiva" : "Inattiva"}
+              </p>
+            </div>
+          ))
+        )}
       </div>
-
-      {/* Aggiungi qui eventualmente una sezione per rewards */}
     </div>
   );
 }
