@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { jwtDecode } from "jwt-decode";
 
 export default function Dashboard() {
   const router = useRouter();
