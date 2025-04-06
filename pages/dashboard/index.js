@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode"; // usa named import
 import { useRouter } from "next/router";
 
 export default function Dashboard() {
@@ -10,7 +10,7 @@ export default function Dashboard() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      const decoded = jwt_decode(token);
+      const decoded = jwtDecode(token);
       console.log("Utente loggato:", decoded);
       setUser(decoded);
     }
