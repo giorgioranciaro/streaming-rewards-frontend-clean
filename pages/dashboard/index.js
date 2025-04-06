@@ -1,21 +1,22 @@
-import { useEffect, useState } from "react";
-import jwt_decode from "jwt-decode";
+ import { useEffect, useState } from "react";
+import jwtDecode from "jwt-decode";
+import { useRouter } from "next/router";
 
 export default function Dashboard() {
   const [rewards, setRewards] = useState([]);
   const [artist, setArtist] = useState(null);
   const [error, setError] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      setError("Token mancante. Effettua il login.");
+      router.push("/login");
       return;
     }
 
-    let decoded;
     try {
-      decoded = jwt_decode(token);
+      jwtDecode(token); // Verifica validità token
     } catch (err) {
       console.error("Errore nel decoding del token:", err);
       setError("Token non valido");
@@ -30,10 +31,7 @@ export default function Dashboard() {
           },
         });
 
-        if (!res.ok) {
-          throw new Error("Errore nella richiesta delle rewards");
-        }
-
+        if (!res.ok) throw new Error("Errore nella richiesta delle rewards");
         const data = await res.json();
         setRewards(data);
       } catch (err) {
@@ -50,10 +48,7 @@ export default function Dashboard() {
           },
         });
 
-        if (!res.ok) {
-          throw new Error("Errore nel fetch dell'artista");
-        }
-
+        if (!res.ok) throw new Error("Errore nel fetch dell'artista");
         const data = await res.json();
         setArtist(data);
       } catch (err) {
@@ -64,7 +59,7 @@ export default function Dashboard() {
 
     fetchRewards();
     fetchArtist();
-  }, []);
+  }, [router]);
 
   return (
     <div style={{ padding: "2rem", fontFamily: "Arial" }}>
