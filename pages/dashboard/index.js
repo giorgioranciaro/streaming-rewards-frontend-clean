@@ -27,7 +27,7 @@ export default function Dashboard() {
         }
 
         const data = await res.json();
-        setRewards(data.rewards !! data);
+        setRewards(data);
       } catch (err) {
         console.error(err);
       } finally {
