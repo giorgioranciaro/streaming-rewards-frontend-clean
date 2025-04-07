@@ -133,6 +133,17 @@ export default function Dashboard() {
           ))}
         </div>
       )}
+
+{/* ➕ Pulsante per creare nuova reward */}
+<div className="text-center mt-10">
+  <button
+    onClick={() => router.push("/dashboard/add-reward")}
+    className="px-6 py-3 bg-green-600 text-white rounded-md shadow hover:bg-green-700"
+  >
+    ➕ Crea nuova reward
+  </button>
+</div>
+
     </div>
   );
 }
