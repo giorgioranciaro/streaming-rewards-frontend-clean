@@ -15,16 +15,6 @@ export default function Dashboard() {
       return;
     }
 
-    let decoded;
-    try {
-      decoded = jwt_decode(token);
-    } catch (error) {
-      console.error("Token decoding failed:", error);
-      localStorage.removeItem("token");
-      router.push("/login");
-      return;
-    }
-
     const fetchRewards = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/rewards`, {
