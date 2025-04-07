@@ -124,7 +124,7 @@ export default function Dashboard() {
       {artist && (
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-2">👤 Info Artista</h2>
-          
+          // <p><strong>ID:</strong> {artist.id}</p>
           {!editingArtist ? (
             <div className="space-y-2">
               <p><strong>Nome:</strong> {artist.name}</p>
