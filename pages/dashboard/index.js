@@ -1,21 +1,25 @@
+// 📦 Import dei React Hooks e router di Next.js
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 export default function Dashboard() {
+  // 🔧 Stato locale per rewards, artista e caricamento
   const router = useRouter();
   const [rewards, setRewards] = useState([]);
   const [artist, setArtist] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // 🧠 useEffect per il recupero dati al caricamento della pagina
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/login");
+      router.push("/login"); // 🔐 Se non loggato, redirect
       return;
     }
 
     const fetchData = async () => {
       try {
+        // 🎁 Fetch delle rewards
         const resRewards = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/rewards`,
           {
@@ -23,6 +27,7 @@ export default function Dashboard() {
           }
         );
 
+        // 👤 Fetch delle info artista
         const resArtist = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/artist/profile`,
           {
@@ -30,10 +35,12 @@ export default function Dashboard() {
           }
         );
 
+        // 🚨 Controllo degli errori
         if (!resRewards.ok || !resArtist.ok) {
           throw new Error("Failed to fetch data");
         }
 
+        // ✅ Dati ricevuti e salvati nello stato
         const rewardsData = await resRewards.json();
         const artistData = await resArtist.json();
         setRewards(rewardsData);
@@ -48,14 +55,17 @@ export default function Dashboard() {
     fetchData();
   }, [router]);
 
+  // 🔄 Loading visuale
   if (loading) {
     return <p className="p-4">Loading data...</p>;
   }
 
+  // 🖼️ UI principale
   return (
     <div className="min-h-screen p-8 bg-gray-100">
       <h1 className="text-3xl font-bold mb-6">🎧 Streaming Rewards Dashboard</h1>
 
+      {/* 👤 Sezione info artista */}
       {artist && (
         <div className="bg-white p-6 rounded-xl shadow-md mb-6">
           <h2 className="text-2xl font-semibold mb-2">👤 Artist Info</h2>
@@ -68,6 +78,7 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* 🎁 Sezione rewards */}
       {rewards.length === 0 ? (
         <p>No rewards available.</p>
       ) : (
