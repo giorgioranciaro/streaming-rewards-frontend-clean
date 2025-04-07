@@ -92,3 +92,27 @@ export default function Dashboard() {
     </div>
   );
 }
+
+// ✅ Recupera i dati profilo dell'artista autenticato
+router.get("/profile", authenticateToken, async (req, res) => {
+  try {
+    const artist = await prisma.artist.findUnique({
+      where: { id: req.user.userId },
+      select: {
+        name: true,
+        email: true,
+        bio: true,
+      },
+    });
+
+    if (!artist) {
+      return res.status(404).json({ error: "Artist not found" });
+    }
+
+    res.json(artist);
+  } catch (error) {
+    console.error("Error fetching artist profile:", error);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
