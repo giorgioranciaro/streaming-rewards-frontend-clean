@@ -91,7 +91,6 @@ export default function Dashboard() {
       )}
     </div>
   );
-}
 
 // ✅ Recupera i dati profilo dell'artista autenticato
 router.get("/profile", authenticateToken, async (req, res) => {
@@ -115,4 +114,6 @@ router.get("/profile", authenticateToken, async (req, res) => {
     res.status(500).json({ error: "Something went wrong" });
   }
 });
+
+}
 
